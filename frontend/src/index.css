@@ -1,0 +1,41 @@
+body {
+  background-color: #f4f7fc;
+  font-family: 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.sidebar {
+  background-color: #1e3a6f;
+  min-height: 100vh;
+  color: white;
+}
+.sidebar .nav-link {
+  color: #e0e0e0;
+}
+.sidebar .nav-link:hover {
+  background-color: #0f2b4f;
+  color: white;
+}
+.card {
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  border: none;
+}
+.btn-primary {
+  background-color: #1e3a6f;
+  border-color: #1e3a6f;
+}
+.btn-primary:hover {
+  background-color: #0f2b4f;
+}
+.badge-pending {
+  background-color: #ffc107;
+  color: #212529;
+}
+.badge-approved {
+  background-color: #28a745;
+  color: white;
+}
+.badge-rejected {
+  background-color: #dc3545;
+  color: white;
+}
