@@ -1,5 +1,4 @@
 import HerbalGarden from '../models/HerbalGarden.js';
-
 // Get gardens with role‑based filtering
 export const getGardens = async (req, res) => {
   try {

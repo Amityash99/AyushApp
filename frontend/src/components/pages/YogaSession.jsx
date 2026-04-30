@@ -9,12 +9,13 @@ const YogaSession = () => {
   const [current, setCurrent] = useState({
     participants: {},
     activities: [],
-    sessionTime: ''          // ✅ Required field default
+    sessionTime: ''
   });
   const [editingId, setEditingId] = useState(null);
   const [selectedPhotos, setSelectedPhotos] = useState([]);
   const [geoLocation, setGeoLocation] = useState({ lat: null, lng: null });
   const [locationError, setLocationError] = useState('');
+  const [loading, setLoading] = useState(false);
   const role = localStorage.getItem('role');
 
   useEffect(() => {
@@ -44,7 +45,10 @@ const YogaSession = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          setGeoLocation({ lat: position.coords.latitude, lng: position.coords.longitude });
+          setGeoLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          });
           setLocationError('');
         },
         () => setLocationError('Unable to retrieve location')
@@ -97,28 +101,12 @@ const YogaSession = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Prepare data to send
+    setLoading(true);
+    const formData = new FormData();
     const dataToSend = {
       ...current,
       geoLocation: geoLocation.lat ? geoLocation : current.geoLocation
     };
-
-    // Validate required fields
-    if (!dataToSend.sessionDate) {
-      alert('Session date is required');
-      return;
-    }
-    if (!dataToSend.sessionTime) {
-      alert('Session time is required');
-      return;
-    }
-    if (!dataToSend.instructorId) {
-      alert('Instructor is required');
-      return;
-    }
-
-    const formData = new FormData();
     formData.append('data', JSON.stringify(dataToSend));
     selectedPhotos.forEach((photo) => formData.append('photos', photo));
 
@@ -137,6 +125,8 @@ const YogaSession = () => {
     } catch (err) {
       console.error(err);
       alert(err.response?.data?.message || 'Submission failed');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -152,15 +142,16 @@ const YogaSession = () => {
     }
   };
 
-  const handleVerify = async (id, status, reason = '') => {
-    try {
-      await API.put(`/yoga-session/${id}/verify`, { status, rejectionReason: reason });
-      fetchSessions();
-    } catch (err) {
-      console.error(err);
-      alert('Verification failed');
-    }
-  };
+
+const handleVerify = async (id, status, reason = '') => {
+  try {
+    await API.put(`/yoga-session/${id}/verify`, { status, rejectionReason: reason });
+    fetchSessions(); // refresh the list
+  } catch (err) {
+    console.error(err);
+    alert('Verification failed: ' + (err.response?.data?.message || err.message));
+  }
+};
 
   const getBadge = (status) => {
     if (status === 'approved') return <Badge bg="success">Approved</Badge>;
@@ -176,7 +167,7 @@ const YogaSession = () => {
           <Button variant="secondary" onClick={fetchSessions} className="me-2">
             Refresh
           </Button>
-          {role === 'aam_center' && (
+          {(role === 'aam_center' || role === 'yoga_instructor') && (
             <Button variant="primary" onClick={() => handleShow()}>
               Add Session
             </Button>
@@ -185,7 +176,7 @@ const YogaSession = () => {
       </div>
 
       {sessions.length === 0 ? (
-        <div className="alert alert-info">No yoga sessions found. Click "Add Session" to create one.</div>
+        <div className="alert alert-info">No yoga sessions found.</div>
       ) : (
         <Table striped bordered hover responsive>
           <thead>
@@ -216,16 +207,25 @@ const YogaSession = () => {
                 <td>{s.activities?.join(', ')}</td>
                 <td>{getBadge(s.verificationStatus)}</td>
                 <td>
-                  {role === 'aam_center' && s.verificationStatus === 'pending' && (
-                    <>
-                      <Button size="sm" variant="info" onClick={() => handleShow(s)}>
-                        Edit
-                      </Button>{' '}
-                      <Button size="sm" variant="danger" onClick={() => handleDelete(s._id)}>
-                        Del
-                      </Button>
-                    </>
-                  )}
+                  {(role === 'aam_center' || role === 'yoga_instructor') &&
+                    s.verificationStatus === 'pending' && (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="info"
+                          onClick={() => handleShow(s)}
+                        >
+                          Edit
+                        </Button>{' '}
+                        <Button
+                          size="sm"
+                          variant="danger"
+                          onClick={() => handleDelete(s._id)}
+                        >
+                          Del
+                        </Button>
+                      </>
+                    )}
                   {role === 'district' && s.verificationStatus === 'pending' && (
                     <>
                       <Button
@@ -256,7 +256,9 @@ const YogaSession = () => {
 
       <Modal show={showModal} onHide={handleClose} size="lg" backdrop="static">
         <Modal.Header closeButton>
-          <Modal.Title>{editingId ? 'Edit Yoga Session' : 'Add Yoga Session'}</Modal.Title>
+          <Modal.Title>
+            {editingId ? 'Edit Yoga Session' : 'Add Yoga Session'}
+          </Modal.Title>
         </Modal.Header>
         <Form onSubmit={handleSubmit}>
           <Modal.Body>
@@ -311,7 +313,11 @@ const YogaSession = () => {
               <Col>
                 <Form.Group>
                   <Form.Label>Session Type</Form.Label>
-                  <Form.Select name="sessionType" value={current.sessionType || ''} onChange={handleChange}>
+                  <Form.Select
+                    name="sessionType"
+                    value={current.sessionType || ''}
+                    onChange={handleChange}
+                  >
                     <option>General</option>
                     <option>NCD</option>
                     <option>Pregnancy</option>
@@ -323,7 +329,11 @@ const YogaSession = () => {
               <Col>
                 <Form.Group>
                   <Form.Label>Venue</Form.Label>
-                  <Form.Select name="venue" value={current.venue || ''} onChange={handleChange}>
+                  <Form.Select
+                    name="venue"
+                    value={current.venue || ''}
+                    onChange={handleChange}
+                  >
                     <option>Indoor</option>
                     <option>Outdoor</option>
                   </Form.Select>
@@ -363,12 +373,14 @@ const YogaSession = () => {
                   <Form.Label>Male</Form.Label>
                   <Form.Control
                     type="number"
-                    name="participants.male"
                     value={current.participants?.male || 0}
                     onChange={(e) =>
                       setCurrent({
                         ...current,
-                        participants: { ...current.participants, male: e.target.value }
+                        participants: {
+                          ...current.participants,
+                          male: e.target.value
+                        }
                       })
                     }
                   />
@@ -379,12 +391,14 @@ const YogaSession = () => {
                   <Form.Label>Female</Form.Label>
                   <Form.Control
                     type="number"
-                    name="participants.female"
                     value={current.participants?.female || 0}
                     onChange={(e) =>
                       setCurrent({
                         ...current,
-                        participants: { ...current.participants, female: e.target.value }
+                        participants: {
+                          ...current.participants,
+                          female: e.target.value
+                        }
                       })
                     }
                   />
@@ -397,12 +411,14 @@ const YogaSession = () => {
                   <Form.Label>Children</Form.Label>
                   <Form.Control
                     type="number"
-                    name="participants.children"
                     value={current.participants?.children || 0}
                     onChange={(e) =>
                       setCurrent({
                         ...current,
-                        participants: { ...current.participants, children: e.target.value }
+                        participants: {
+                          ...current.participants,
+                          children: e.target.value
+                        }
                       })
                     }
                   />
@@ -413,12 +429,14 @@ const YogaSession = () => {
                   <Form.Label>Other</Form.Label>
                   <Form.Control
                     type="number"
-                    name="participants.other"
                     value={current.participants?.other || 0}
                     onChange={(e) =>
                       setCurrent({
                         ...current,
-                        participants: { ...current.participants, other: e.target.value }
+                        participants: {
+                          ...current.participants,
+                          other: e.target.value
+                        }
                       })
                     }
                   />
@@ -430,31 +448,44 @@ const YogaSession = () => {
               <Form.Check
                 type="checkbox"
                 label="Instructor Present"
-                name="instructorPresent"
                 checked={current.instructorPresent || false}
-                onChange={(e) => setCurrent({ ...current, instructorPresent: e.target.checked })}
+                onChange={(e) =>
+                  setCurrent({ ...current, instructorPresent: e.target.checked })
+                }
               />
             </Form.Group>
 
             <h6>Activities Conducted</h6>
-            {['Pranayama', 'Asanas', 'Surya Namaskar', 'Meditation', 'Health talk'].map((act) => (
-              <Form.Check
-                key={act}
-                type="checkbox"
-                label={act}
-                checked={current.activities?.includes(act) || false}
-                onChange={() => handleActivityCheck(act)}
-              />
-            ))}
+            {['Pranayama', 'Asanas', 'Surya Namaskar', 'Meditation', 'Health talk'].map(
+              (act) => (
+                <Form.Check
+                  key={act}
+                  type="checkbox"
+                  label={act}
+                  checked={current.activities?.includes(act) || false}
+                  onChange={() => handleActivityCheck(act)}
+                />
+              )
+            )}
 
             <hr />
             <h6>Photos (upload up to 4)</h6>
             <Form.Group className="mb-3">
-              <Form.Control type="file" multiple accept="image/*" onChange={handleFileChange} />
+              <Form.Control
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleFileChange}
+              />
             </Form.Group>
 
             <h6>Geo‑tagging</h6>
-            <Button variant="secondary" type="button" onClick={getCurrentLocation} className="mb-2">
+            <Button
+              variant="secondary"
+              type="button"
+              onClick={getCurrentLocation}
+              className="mb-2"
+            >
               Get Current Location
             </Button>
             {geoLocation.lat && (
@@ -466,15 +497,20 @@ const YogaSession = () => {
 
             <Form.Group className="mb-3">
               <Form.Label>Comments / Issues</Form.Label>
-              <Form.Control as="textarea" name="comments" value={current.comments || ''} onChange={handleChange} />
+              <Form.Control
+                as="textarea"
+                name="comments"
+                value={current.comments || ''}
+                onChange={handleChange}
+              />
             </Form.Group>
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={handleClose}>
               Cancel
             </Button>
-            <Button variant="primary" type="submit">
-              Save Session
+            <Button variant="primary" type="submit" disabled={loading}>
+              {loading ? 'Saving...' : 'Save Session'}
             </Button>
           </Modal.Footer>
         </Form>

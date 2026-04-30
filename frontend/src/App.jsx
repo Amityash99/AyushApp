@@ -19,6 +19,12 @@ import IECBranding from './components/pages/IECBranding';
 import NCDSurvey from './components/pages/NCDSurvey';
 import Inspection from './components/pages/Inspection';
 
+import YogaDashboard from './components/pages/YogaDashboard';
+import YogaAttendance from './components/pages/YogaAttendance';
+import PwdDashboard from './components/pages/PwdDashboard';
+// import YogaPerformance from './components/pages/YogaPerformance';
+
+
 const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem('token');
   return token ? children : <Navigate to="/login" />;
@@ -57,6 +63,13 @@ function App() {
                         <Route path="/ncd" element={<NCDSurvey />} />
                         <Route path="/inspection" element={<Inspection />} />
                         <Route path="/" element={<Navigate to="/dashboard" />} />
+
+                        <Route path="/yoga-dashboard" element={<YogaDashboard />} />
+                        <Route path="/yoga-attendance" element={<YogaAttendance />} />
+                        <Route path="/pwd-dashboard" element={<PwdDashboard />} />
+                        {/* <Route path="/yoga-performance" element={<YogaPerformance />} /> */}
+
+
                       </Routes>
                     </Container>
                   </main>

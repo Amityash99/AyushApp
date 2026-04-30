@@ -22,6 +22,10 @@ import ncdCampaignRoutes from './routes/ncdCampaignRoutes.js';
 import ncdScreeningRoutes from './routes/ncdScreeningRoutes.js';
 import inspectionRoutes from './routes/inspectionRoutes.js';
 
+// import yogaInstructorRoutes from './routes/yogaInstructorRoutes.js';
+// import yogaSessionRoutes from './routes/yogaSessionRoutes.js';
+import yogaInstructorAttendanceRoutes from './routes/yogaInstructorAttendanceRoutes.js';
+
 
 dotenv.config();
 
@@ -62,6 +66,11 @@ app.use('/api/branding-work', brandingWorkRoutes);
 app.use('/api/ncd-campaign', ncdCampaignRoutes);
 app.use('/api/ncd-screening', ncdScreeningRoutes);
 app.use('/api/inspection', inspectionRoutes);
+
+
+// app.use('/api/yoga-instructor', yogaInstructorRoutes);
+// app.use('/api/yoga-session', yogaSessionRoutes);
+app.use('/api/yoga-instructor-attendance', yogaInstructorAttendanceRoutes);
 
 
 

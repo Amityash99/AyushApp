@@ -3,8 +3,38 @@ import { Nav } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
 const Sidebar = () => {
-  const role = localStorage.getItem('role'); // aam_center, district, directorate, state
+  const role = localStorage.getItem('role');
 
+  // Yoga instructor sees only yoga links
+  if (role === 'yoga_instructor') {
+    return (
+      <Nav className="flex-column p-3">
+        <Nav.Link as={Link} to="/yoga-dashboard" className="text-white">Yoga Dashboard</Nav.Link>
+        <Nav.Link as={Link} to="/yoga-session" className="text-white">My Sessions</Nav.Link>
+        <Nav.Link as={Link} to="/yoga-attendance" className="text-white">My Attendance</Nav.Link>
+      </Nav>
+    );
+  }
+
+  // PWD department sees only construction
+  // if (role === 'pwd') {
+  //   return (
+  //     <Nav className="flex-column p-3">
+  //       <Nav.Link as={Link} to="/construction" className="text-white">PWD Department</Nav.Link>
+  //     </Nav>
+  //   );
+  // }
+
+  if (role === 'pwd') {
+  return (
+    <Nav className="flex-column p-3">
+      <Nav.Link as={Link} to="/pwd-dashboard" className="text-white">PWD Dashboard</Nav.Link>
+      <Nav.Link as={Link} to="/construction" className="text-white">Construction Works</Nav.Link>
+    </Nav>
+  );
+}
+
+  // Full sidebar for other roles (aam_center, district, directorate, state)
   return (
     <Nav className="flex-column p-3">
       <Nav.Link as={Link} to="/dashboard" className="text-white">Dashboard</Nav.Link>

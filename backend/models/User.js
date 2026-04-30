@@ -1,3 +1,4 @@
+
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
@@ -7,12 +8,13 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   role: {
     type: String,
-    enum: ['aam_center', 'district', 'directorate', 'state'],
+    enum: ['aam_center', 'district', 'directorate', 'state', 'yoga_instructor','pwd'],
     default: 'aam_center'
   },
-  district: { type: String }, // for district users
-  directorate: { type: String }, // for directorate users (Ayurveda/Homeo/Unani)
-  centerId: { type: String } // for aam_center users
+  district: { type: String },
+  directorate: { type: String },
+  centerId: { type: String },
+  instructorId: { type: mongoose.Schema.Types.ObjectId, ref: 'YogaInstructor' }
 }, { timestamps: true });
 
 userSchema.pre('save', async function(next) {

@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const yogaInstructorAttendanceSchema = new mongoose.Schema({
+const attendanceSchema = new mongoose.Schema({
   instructorId: { type: mongoose.Schema.Types.ObjectId, ref: 'YogaInstructor', required: true },
   date: { type: Date, required: true },
   present: { type: Boolean, default: false },
@@ -10,4 +10,4 @@ const yogaInstructorAttendanceSchema = new mongoose.Schema({
   reportedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 }, { timestamps: true });
 
-export default mongoose.model('YogaInstructorAttendance', yogaInstructorAttendanceSchema);
+export default mongoose.model('YogaInstructorAttendance', attendanceSchema);

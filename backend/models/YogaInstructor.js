@@ -1,7 +1,7 @@
+
 import mongoose from 'mongoose';
 
 const yogaInstructorSchema = new mongoose.Schema({
-  // Basic info
   name: { type: String, required: true },
   fatherName: String,
   gender: { type: String, enum: ['Male', 'Female', 'Other'] },
@@ -12,7 +12,7 @@ const yogaInstructorSchema = new mongoose.Schema({
   qualification: String,
   certificationBody: String,
   workingStatus: { type: String, enum: ['Full-time', 'Part-time', 'Outsourced', 'Honorarium'] },
-  assignedCenter: String,
+  assignedCenter: { type: String, required: true },
   dateOfJoining: Date,
   contractValidity: Date,
   availabilityStatus: { type: String, enum: ['Available', 'On Leave', 'Expired'], default: 'Available' },
@@ -27,18 +27,19 @@ const yogaInstructorSchema = new mongoose.Schema({
     bankName: String,
     accountHolderName: String
   },
-  // Verification
+  centerId: { type: String },
+  district: { type: String },
   verificationStatus: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
   verifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   verifiedAt: Date,
   rejectionReason: String
 }, { timestamps: true });
 
-// Auto‑disable when contract expires
-yogaInstructorSchema.methods.checkExpiry = function() {
+// Auto-disable when contract expires
+yogaInstructorSchema.methods.checkExpiry = async function() {
   if (this.contractValidity && new Date() > this.contractValidity) {
     this.availabilityStatus = 'Expired';
-    this.save();
+    await this.save();
   }
 };
 
