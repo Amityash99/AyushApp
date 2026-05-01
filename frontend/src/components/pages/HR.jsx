@@ -13,7 +13,7 @@ const HR = () => {
 
   const fetchItems = async () => {
     try {
-      const res = await API.get('/hr');
+      const res = await API.get('/api/hr');
       setItems(res.data);
     } catch (err) { console.error(err); }
   };
@@ -27,20 +27,20 @@ const HR = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (editingId) await API.put(`/hr/${editingId}`, current);
-      else await API.post('/hr', current);
+      if (editingId) await API.put(`/api/hr/${editingId}`, current);
+      else await API.post('/api/hr', current);
       fetchItems();
       handleClose();
     } catch (err) { console.error(err); }
   };
   const handleDelete = async (id) => {
     if (window.confirm('Delete?')) {
-      try { await API.delete(`/hr/${id}`); fetchItems(); } catch (err) { console.error(err); }
+      try { await API.delete(`/api/hr/${id}`); fetchItems(); } catch (err) { console.error(err); }
     }
   };
   const handleVerify = async (id, status, reason) => {
     try {
-      await API.put(`/hr/${id}/verify`, { status, rejectionReason: reason });
+      await API.put(`/api/hr/${id}/verify`, { status, rejectionReason: reason });
       fetchItems();
     } catch (err) { console.error(err); }
   };
