@@ -21,7 +21,7 @@ const Construction = () => {
   useEffect(() => { fetchItems(); }, []);
 
   const fetchItems = async () => {
-    try { const res = await API.get('/construction'); setItems(res.data); } catch (err) { console.error(err); }
+    try { const res = await API.get('/api/construction'); setItems(res.data); } catch (err) { console.error(err); }
   };
 
   const handleClose = () => {
@@ -64,11 +64,11 @@ const Construction = () => {
     if (selectedFiles.invoiceCopy) formData.append('invoiceCopy', selectedFiles.invoiceCopy);
     try {
       if (editingId) {
-        await API.put(`/construction/${editingId}`, formData, {
+        await API.put(`/api/construction/${editingId}`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
       } else {
-        await API.post('/construction', formData, {
+        await API.post('/api/construction', formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
       }
@@ -79,12 +79,12 @@ const Construction = () => {
 
   const handleDelete = async (id) => {
     if (window.confirm('Delete?')) {
-      try { await API.delete(`/construction/${id}`); fetchItems(); } catch (err) { console.error(err); }
+      try { await API.delete(`/api/construction/${id}`); fetchItems(); } catch (err) { console.error(err); }
     }
   };
 
   const handleVerify = async (id, status, reason) => {
-    try { await API.put(`/construction/${id}/verify`, { status, rejectionReason: reason }); fetchItems(); } catch (err) { console.error(err); }
+    try { await API.put(`/api/construction/${id}/verify`, { status, rejectionReason: reason }); fetchItems(); } catch (err) { console.error(err); }
   };
 
   const getBadge = (status) => {
