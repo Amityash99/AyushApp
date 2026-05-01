@@ -18,7 +18,7 @@ const HerbalGarden = () => {
 
   const fetchGardens = async () => {
     try {
-      const res = await API.get('/garden');
+      const res = await API.get('/api/garden');
       setGardens(res.data);
     } catch (err) { console.error(err); }
   };
@@ -105,9 +105,9 @@ const HerbalGarden = () => {
 
     try {
       if (editingId) {
-        await API.put(`/garden/${editingId}`, dataToSend);
+        await API.put(`/api/garden/${editingId}`, dataToSend);
       } else {
-        await API.post('/garden', formData, {
+        await API.post('/api/garden', formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
       }
@@ -124,7 +124,7 @@ const HerbalGarden = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Delete this garden?')) {
       try {
-        await API.delete(`/garden/${id}`);
+        await API.delete(`/api/garden/${id}`);
         fetchGardens();
       } catch (err) { console.error(err); alert('Delete failed'); }
     }
@@ -132,7 +132,7 @@ const HerbalGarden = () => {
 
   const handleVerify = async (id, status, reason = '') => {
     try {
-      await API.put(`/garden/${id}/verify`, { status, rejectionReason: reason });
+      await API.put(`/api/garden/${id}/verify`, { status, rejectionReason: reason });
       fetchGardens();
     } catch (err) { console.error(err); alert('Verification failed'); }
   };
