@@ -9,7 +9,7 @@ const PwdDashboard = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await API.get('/construction/stats');
+        const res = await API.get('/api/construction/stats');
         setStats(res.data);
       } catch (err) {
         console.error(err);
